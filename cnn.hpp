@@ -32,7 +32,7 @@ class ConvolutionLayer
     filters.resize(numFilters);
     for (size_t i=0; i<numFilters; i++)
     {
-      filters[i] = arma::zeros(filterHeight, filterWidth);
+      filters[i] = arma::zeros(filterHeight, filterWidth, inputDepth);
       filters[i].imbue( [&]() { return _getTruncNormalVal(0.0, 1.0); } );
     }
     if (DEBUG)
@@ -40,11 +40,17 @@ class ConvolutionLayer
       for (size_t i=0; i<numFilters; i++)
       {
         std::cout << DEBUG_PREFIX << "Filter #" << i << std::endl;
-        for (size_t ridx=0; ridx<filterHeight; ridx++)
-          std::cout << DEBUG_PREFIX << filters[i].row(ridx);
+        std::cout << DEBUG_PREFIX << arma::size(filters[i]) << std::endl;
+        for (size_t sidx=0; sidx<inputDepth; sidx++)
+        {
+          std::cout << DEBUG_PREFIX << "  Slice # " << sidx << std::endl;
+          for (size_t ridx=0; ridx<filterHeight; ridx++)
+            std::cout << DEBUG_PREFIX << filters[i].slice(sidx).row(ridx);
+        }
       }
     }
   }
+
  private:
   size_t inputHeight;
   size_t inputWidth;
@@ -54,7 +60,7 @@ class ConvolutionLayer
   size_t stride;
   size_t numFilters;
 
-  std::vector<arma::mat> filters;
+  std::vector<arma::cube> filters;
 
   double _getTruncNormalVal(double mean, double variance)
   {

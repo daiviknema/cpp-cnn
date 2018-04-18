@@ -16,4 +16,10 @@ So we've hit the ground running with the ConvolutionalLayer constructor -- It in
 
 Cool cool .. the weight initializations look correct. Time for a git commit and then we move on to the forward pass through the conv layer.
 
+I'm going to go for the simplest kind of convolution implementation there is -- no padding, no FFT.
+
+I've realized that filters (in general) have a depth dimension as well, and I've defined filters as 2D matrices.. Need to fix that.
+
+Done fixing the filter dimensions. Commit and move on to the forward pass.
+
 
