@@ -22,4 +22,20 @@ I've realized that filters (in general) have a depth dimension as well, and I've
 
 Done fixing the filter dimensions. Commit and move on to the forward pass.
 
+Update: I went for a snack break. My boss told me to do a few things -- which I mostly ignored, because he's an idiot. And I just finished the forward pass implementation. It feels weird working on this in the office, so I'm going to head home and continue from there. I plan to test the forward pass implementation first and then try and figure out how the backward pass is going to go.
 
+A few more notes on the rest of the implementation:
+1. The optimizer -- for now, I'll just use vanilla mini-batch SGD  to train. Maybe later I'll switch it up to Adam or RMSprop.
+
+2. I realize that I'll need to add layers for ReLU activation in the hidden units, and a softmax layer at the very end of the network.
+
+3. I'll probably add a class like "class LeNet" that contains the entire CNN architecture. I dont really plan on reusing any of the layers, so its fine if they're a bit dirty.
+
+3 minutes till my cab arrives .. better head down.
+
+Okay, I didn't really do much at home yesterday, and today I was a bit busy doing pointless things at work. I found some time now to work on this, and have completed the backward pass. Actually, I'd been thinking about the math of the backward pass through the conv layer today.. and I was quite surprised at how easily it worked out to nice expressions. Hopefully I'll get some time to write a blog post about it -- I think I actually found a nice method to it as well. Anyway, I'd scribbled down
+most of it in my little notebook at work and the implementation wasn't too hard.
+
+I've still got the forward pass testing in the backlog. Now, I can add the backward pass testing as well. I've added a function stub for gradient check as well in the CovolutionLayer class. I think I'll make 100% sure that theres nothing wring with my Conv layer before proceeding with the other components (dense layer, max pooling, relu and sigmoid). Hopefully tomorrow I'll get time for testing and then finish the CNN over the weekend.
+
+Oh yeah, a minor note -- I'd not differentiated between the strides in the vertical and horizontal directions. Updated this.
