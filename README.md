@@ -39,3 +39,5 @@ most of it in my little notebook at work and the implementation wasn't too hard.
 I've still got the forward pass testing in the backlog. Now, I can add the backward pass testing as well. I've added a function stub for gradient check as well in the CovolutionLayer class. I think I'll make 100% sure that theres nothing wring with my Conv layer before proceeding with the other components (dense layer, max pooling, relu and sigmoid). Hopefully tomorrow I'll get time for testing and then finish the CNN over the weekend.
 
 Oh yeah, a minor note -- I'd not differentiated between the strides in the vertical and horizontal directions. Updated this.
+
+I've been giving a bit of thought to writing proper tests -- test driven development and all that. I've decided to go with the boost.Test framework (which also happens to be used by mlpack).
