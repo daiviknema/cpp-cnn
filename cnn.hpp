@@ -72,7 +72,7 @@ class ConvolutionLayer
     {
       for (size_t i=0; i <= inputHeight - filterHeight; i += verticalStride)
         for (size_t j=0; j <= inputWidth - filterWidth; j += horizontalStride)
-          output(i, j, fidx) = arma::dot(
+          output((i/verticalStride), (j/horizontalStride), fidx) = arma::dot(
               arma::vectorise(
                   input.subcube(i, j, 0,
                                 i+filterHeight-1, j+filterWidth-1, inputDepth-1)
@@ -131,14 +131,14 @@ class ConvolutionLayer
 
     for (size_t sidx=0; sidx < numFilters; sidx++)
     {
-      for (size_t r=0; r<output.n_rows; r += verticalStride)
+      for (size_t r=0; r<output.n_rows; r ++)
       {
-        for (size_t c=0; c<output.n_cols; c += horizontalStride)
+        for (size_t c=0; c<output.n_cols; c ++)
         {
           arma::cube tmp(arma::size(input), arma::fill::zeros);
-          tmp.subcube(r, c, 0, r+filterHeight-1, c+filterWidth-1, inputDepth-1)
+          tmp.subcube(r*verticalStride, c*horizontalStride, 0, (r*verticalStride)+filterHeight-1, (c*horizontalStride)+filterWidth-1, inputDepth-1)
               = filters[sidx];
-          gradInput += upstreamGradient.slice(sidx)(r,c) * tmp;
+          gradInput += upstreamGradient.slice(sidx)(r, c) * tmp;
         }
       }
     }
@@ -156,14 +156,14 @@ class ConvolutionLayer
 
     for (size_t fidx=0; fidx<numFilters; fidx++)
     {
-      for (size_t r=0; r<output.n_rows; r += verticalStride)
+      for (size_t r=0; r<output.n_rows; r ++)
       {
-        for (size_t c=0; c<output.n_cols; c += horizontalStride)
+        for (size_t c=0; c<output.n_cols; c ++)
         {
           arma::cube tmp(arma::size(filters[fidx]), arma::fill::zeros);
-          tmp = input.subcube(r, c, 0,
-              r+filterHeight-1, c+filterWidth-1, inputDepth-1);
-          gradFilters[fidx] += upstreamGradient.slice(fidx)(r,c) * tmp;
+          tmp = input.subcube(r*verticalStride, c*horizontalStride, 0,
+              (r*verticalStride)+filterHeight-1, (c*horizontalStride)+filterWidth-1, inputDepth-1);
+          gradFilters[fidx] += upstreamGradient.slice(fidx)(r, c) * tmp;
         }
       }
     }
