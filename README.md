@@ -43,3 +43,7 @@ Oh yeah, a minor note -- I'd not differentiated between the strides in the verti
 I've been giving a bit of thought to writing proper tests -- test driven development and all that. I've decided to go with the boost.Test framework (which also happens to be used by mlpack).
 
 It WORKS!!! Both the forward and backward pass seem to be working fine on basic tests. I've even written a gradient check and both the analytic and numeric gradients agree. I didn't expect things to go so smoothly, I was completely prepared to shed tears -- but hey, looks like I'm smart after all.
+
+I've added a larger test for the backward pass - and used different prime values for input dimensions and filter dimensions. This was a good test to add.. it pointed out a bug in the way gradients were being propagated when the stride was > 1.
+
+With this, the convolution layer looks pretty much done to me - atleast for now. I can proceed with the dense layer now. I think I'll refactor the project into more files.

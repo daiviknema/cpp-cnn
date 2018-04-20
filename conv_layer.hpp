@@ -1,5 +1,5 @@
-#ifndef CNN_HPP
-#define CNN_HPP
+#ifndef CONV_LAYER_HPP
+#define CONV_LAYER_HPP
 
 #include <armadillo>
 #include <vector>
@@ -8,7 +8,7 @@
 #include <cassert>
 
 #define DEBUG true
-#define DEBUG_PREFIX "[DEBUG ]\t"
+#define DEBUG_PREFIX "[DEBUG CONV LAYER ]\t"
 
 class ConvolutionLayer
 {
@@ -236,10 +236,6 @@ class ConvolutionLayer
   arma::cube accumulatedGradInput;
   std::vector<arma::cube> gradFilters;
   std::vector<arma::cube> accumulatedGradFilters;
-};
-
-class PoolingLayer
-{
 };
 
 #endif
