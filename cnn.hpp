@@ -39,7 +39,14 @@ class ConvolutionLayer
       filters[i].imbue( [&]() { return _getTruncNormalVal(0.0, 1.0); } );
     }
     _resetAccumulatedGradients();
-    #if DEBUG
+#if DEBUG
+    std::cout
+        << DEBUG_PREFIX << "---------------------------------------------"
+        << std::endl
+        << DEBUG_PREFIX << "CONSTRUCTOR DEBUG OUTPUT"
+        << std::endl
+        << DEBUG_PREFIX << "---------------------------------------------"
+        << std::endl;
     for (size_t i=0; i<numFilters; i++)
     {
       std::cout << DEBUG_PREFIX << "Filter #" << i << std::endl;
@@ -51,7 +58,7 @@ class ConvolutionLayer
           std::cout << DEBUG_PREFIX << filters[i].slice(sidx).row(ridx);
       }
     }
-    #endif
+#endif
   }
 
   void Forward(arma::cube& input, arma::cube& output)
@@ -75,6 +82,43 @@ class ConvolutionLayer
 
     this->input = input;
     this->output = output;
+
+#if DEBUG
+    std::cout
+        << DEBUG_PREFIX << "---------------------------------------------"
+        << std::endl
+        << DEBUG_PREFIX << "FORWARD PASS DEBUG OUTPUT"
+        << std::endl
+        << DEBUG_PREFIX << "---------------------------------------------"
+        << std::endl;
+
+    // Print input.
+    for (size_t i=0; i<inputDepth; i++)
+    {
+      std::cout << DEBUG_PREFIX << "Input slice #" << i << std::endl;
+      for (size_t r=0; r<inputHeight; r++)
+        std::cout << DEBUG_PREFIX << input.slice(i).row(r);
+    }
+    // Print filters.
+    for (size_t i=0; i<numFilters; i++)
+    {
+      std::cout << DEBUG_PREFIX << "Filter #" << i << std::endl;
+      std::cout << DEBUG_PREFIX << arma::size(filters[i]) << std::endl;
+      for (size_t sidx=0; sidx<inputDepth; sidx++)
+      {
+        std::cout << DEBUG_PREFIX << "  Slice # " << sidx << std::endl;
+        for (size_t ridx=0; ridx<filterHeight; ridx++)
+          std::cout << DEBUG_PREFIX << filters[i].slice(sidx).row(ridx);
+      }
+    }
+    // Print output.
+    for (size_t i=0; i<numFilters; i++)
+    {
+      std::cout << DEBUG_PREFIX << "Output slice #" << i << std::endl;
+      for (size_t r=0; r<output.n_rows; r++)
+        std::cout << DEBUG_PREFIX << output.slice(i).row(r);
+    }
+#endif
   }
 
   void Backward(arma::cube& upstreamGradient)
@@ -98,13 +142,17 @@ class ConvolutionLayer
         }
       }
     }
+#if DEBUG
+    std::cout << DEBUG_PREFIX << "Gradient wrt input:" << std::endl;
+    std::cout << gradInput << std::endl;
+#endif
 
     accumulatedGradInput += gradInput;
 
     gradFilters.clear();
     gradFilters.resize(numFilters);
     for (size_t i=0; i<numFilters; i++)
-      gradFilters[i] = arma::zeros(filterHeight, filterWidth, inputWidth);
+      gradFilters[i] = arma::zeros(filterHeight, filterWidth, inputDepth);
 
     for (size_t fidx=0; fidx<numFilters; fidx++)
     {
@@ -119,6 +167,11 @@ class ConvolutionLayer
         }
       }
     }
+#if DEBUG
+    std::cout << DEBUG_PREFIX << "Gradient wrt filters:" << std::endl;
+    for (size_t i=0; i<numFilters; i++)
+      std::cout << gradFilters[i] << std::endl;
+#endif
 
     for (size_t fidx=0; fidx<numFilters; fidx++)
       accumulatedGradFilters[fidx] += gradFilters[fidx];
@@ -131,6 +184,14 @@ class ConvolutionLayer
 
     _resetAccumulatedGradients();
   }
+
+  void setFilters(std::vector<arma::cube> filters) { this->filters = filters; }
+
+  std::vector<arma::cube> getFilters() { return this->filters; }
+
+  arma::cube getGradientWrtInput() { return gradInput; }
+
+  std::vector<arma::cube> getGradientWrtFilters() { return gradFilters; }
 
  private:
   size_t inputHeight;

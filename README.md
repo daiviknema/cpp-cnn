@@ -41,3 +41,5 @@ I've still got the forward pass testing in the backlog. Now, I can add the backw
 Oh yeah, a minor note -- I'd not differentiated between the strides in the vertical and horizontal directions. Updated this.
 
 I've been giving a bit of thought to writing proper tests -- test driven development and all that. I've decided to go with the boost.Test framework (which also happens to be used by mlpack).
+
+It WORKS!!! Both the forward and backward pass seem to be working fine on basic tests. I've even written a gradient check and both the analytic and numeric gradients agree. I didn't expect things to go so smoothly, I was completely prepared to shed tears -- but hey, looks like I'm smart after all.
