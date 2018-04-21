@@ -47,3 +47,10 @@ It WORKS!!! Both the forward and backward pass seem to be working fine on basic 
 I've added a larger test for the backward pass - and used different prime values for input dimensions and filter dimensions. This was a good test to add.. it pointed out a bug in the way gradients were being propagated when the stride was > 1.
 
 With this, the convolution layer looks pretty much done to me - atleast for now. I can proceed with the dense layer now. I think I'll refactor the project into more files.
+
+Oh wait, there need to be more tests for checking if the gradients are being accumulated and if the batch update is happening correctly. I'll add those after some part of the dense layer implementation.
+
+Yeah.. I went to sleep after I got the conv layer working. Today is saturday, so I've been at this for a while -- and here's the update. I've completed the dense layer implementation and written tests for all of it. It works really nicely. I've also been giving some thought to how I'm going to parse the MNIST data -- I think I'll just use mlpack's data::Load functionality to load the data into armadillo matrices and then let my CNN model take it from there. I really dont want to be writing
+code to parse a binary file into an armadillo matrix by myself. Also, I think in the gradient check I did for the conv layer backward pass, I checked only the gradient wrt input -- and completely forgot about the gradient wrt filters. I'm going to add that now.
+
+Next on the TODO list would be the implementation of softmax layer, max pooling layer and relu layer (in that order).
