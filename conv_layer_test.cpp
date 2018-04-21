@@ -113,14 +113,6 @@ BOOST_AUTO_TEST_CASE(BackwardPassBigTest)
   // Input is 7 rows, 11 cols, and 3 slices.
   arma::cube input(7, 11, 3, arma::fill::randn);
 
-  arma::cube filter1(3, 5, 3, arma::fill::zeros);
-
-  arma::cube filter2(3, 5, 3, arma::fill::zeros);
-
-  std::vector<arma::cube> filters;
-  filters.push_back(filter1);
-  filters.push_back(filter2);
-
   ConvolutionLayer c(
       7,  // Input height.
       11,  // Input width.
@@ -158,10 +150,40 @@ BOOST_AUTO_TEST_CASE(BackwardPassBigTest)
     c.Forward(input, output);
     double l2 = arma::accu(output);
     approxGradientWrtInput[i] = (l1 - l2)/(2.0*disturbance);
+    input[i] += disturbance;
   }
 
   std::cout << "Approx gradient wrt inputs:" << std::endl;
   std::cout << approxGradientWrtInput << std::endl;
 
   BOOST_REQUIRE(arma::approx_equal(gradInput, approxGradientWrtInput, "absdiff", disturbance));
+
+  std::vector<arma::cube> approxGradientWrtFilters(2);
+  approxGradientWrtFilters[0] = arma::zeros(3, 5, 3);
+  approxGradientWrtFilters[1] = arma::zeros(3, 5, 3);
+
+  std::vector<arma::cube> filters = c.getFilters();
+
+  for (size_t fidx=0; fidx<2; fidx++)
+  {
+    for (size_t idx=0; idx<filters[fidx].n_elem; idx++)
+    {
+      filters[fidx][idx] += disturbance;
+      c.setFilters(filters);
+      c.Forward(input, output);
+      double l1 = arma::accu(output);
+      filters[fidx][idx] -= 2.0*disturbance;
+      c.setFilters(filters);
+      c.Forward(input, output);
+      double l2 = arma::accu(output);
+      approxGradientWrtFilters[fidx][idx] = (l1-l2)/(2.0*disturbance);
+      filters[fidx][idx] += disturbance;
+      c.setFilters(filters);
+    }
+  }
+
+  for (size_t fidx=0; fidx<2; fidx++)
+  {
+    BOOST_REQUIRE(arma::approx_equal(gradFilters[fidx], approxGradientWrtFilters[fidx], "absdiff", disturbance));
+  }
 }

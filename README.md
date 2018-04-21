@@ -54,3 +54,5 @@ Yeah.. I went to sleep after I got the conv layer working. Today is saturday, so
 code to parse a binary file into an armadillo matrix by myself. Also, I think in the gradient check I did for the conv layer backward pass, I checked only the gradient wrt input -- and completely forgot about the gradient wrt filters. I'm going to add that now.
 
 Next on the TODO list would be the implementation of softmax layer, max pooling layer and relu layer (in that order).
+
+Added gradient wrt filters check in the conv layer backward pass test. As expected, gradients are correct.
