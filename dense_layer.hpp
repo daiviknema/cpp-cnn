@@ -56,6 +56,12 @@ class DenseLayer
     accumulatedGradWeights += gradWeights;
   }
 
+  void UpdateWeights(size_t batchSize, double learningRate)
+  {
+    weights = weights - learningRate * (accumulatedGradWeights/batchSize);
+    _resetAccumulatedGradients();
+  }
+
   arma::mat getGradientWrtWeights() { return gradWeights; }
 
   arma::cube getGradientWrtInput() { return gradInput; }

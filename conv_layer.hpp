@@ -177,10 +177,10 @@ class ConvolutionLayer
       accumulatedGradFilters[fidx] += gradFilters[fidx];
   }
 
-  void UpdateFilterWeights(size_t batchSize)
+  void UpdateFilterWeights(size_t batchSize, double learningRate)
   {
     for (size_t fidx=0; fidx<numFilters; fidx++)
-      filters[fidx] -= (accumulatedGradFilters[fidx]/batchSize);
+      filters[fidx] -= learningRate * (accumulatedGradFilters[fidx]/batchSize);
 
     _resetAccumulatedGradients();
   }
