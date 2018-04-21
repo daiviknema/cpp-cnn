@@ -55,4 +55,6 @@ code to parse a binary file into an armadillo matrix by myself. Also, I think in
 
 Next on the TODO list would be the implementation of softmax layer, max pooling layer and relu layer (in that order).
 
-Added gradient wrt filters check in the conv layer backward pass test. As expected, gradients are correct.
+Added gradient wrt filters check in the conv layer backward pass test. As expected, gradients are correct. I've also remembered that I need to add the update weights function in the dense layer, and write tests to check the updates.
+
+Added softmax layer and tests for forward and backward passes.
