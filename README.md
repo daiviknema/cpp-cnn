@@ -63,3 +63,5 @@ Okay, so yesterday was SUnday and I didn't do shit. I was at work all day today 
 we'll know for sure.
 
 Yep. It works. I guess only RelU remains now.
+
+ReLU Done! All the components are done. I think I'll write some more tests to try out small networks before I create LeNet.
