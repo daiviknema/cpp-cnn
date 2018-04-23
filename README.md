@@ -58,3 +58,8 @@ Next on the TODO list would be the implementation of softmax layer, max pooling 
 Added gradient wrt filters check in the conv layer backward pass test. As expected, gradients are correct. I've also remembered that I need to add the update weights function in the dense layer, and write tests to check the updates.
 
 Added softmax layer and tests for forward and backward passes.
+
+Okay, so yesterday was SUnday and I didn't do shit. I was at work all day today and after that I was waiting for the Google Summer of Code results to be announced (too excited to get any work done). Anyway, the results were a big let down - not that I was expecting a selection.. still, rejection hurts. I'm back at it with the MaxPooling layer implementation. The backward pass proved to be trickier than expected but I think I've got it right -- I'm going to write the tests for it now, and then
+we'll know for sure.
+
+Yep. It works. I guess only RelU remains now.
