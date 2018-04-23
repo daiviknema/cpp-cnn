@@ -65,3 +65,7 @@ we'll know for sure.
 Yep. It works. I guess only RelU remains now.
 
 ReLU Done! All the components are done. I think I'll write some more tests to try out small networks before I create LeNet.
+
+Actually, one component is still remains -- the loss layer. Imma have to implement cross entropy loss first
+
+Implemented cross entropy loss along with tests. Now we can move to the integration tests.
