@@ -4,6 +4,9 @@
 #include <boost/test/unit_test.hpp>
 #include "conv_layer.hpp"
 
+#define DEBUG false
+#define DEBUG_PREFIX "[CONV LAYER TESTS ]\t"
+
 BOOST_AUTO_TEST_CASE(ConstructorTest)
 {
   ConvolutionLayer c(
@@ -102,10 +105,25 @@ BOOST_AUTO_TEST_CASE(BackwardPassTest)
     c.Forward(input, output);
     double l2 = arma::accu(output);
     approxGradientWrtInput[i] = (l1 - l2)/(2.0*disturbance);
+    input[i] += disturbance;
   }
 
-  std::cout << "Approx gradient wrt inputs:" << std::endl;
-  std::cout << approxGradientWrtInput << std::endl;
+#if DEBUG
+  std::cout
+      << DEBUG_PREFIX << "---------------------------------------------"
+      << std::endl
+      << DEBUG_PREFIX << "BACKWARD PASS TEST (BackwardPassTest) DEBUG OUTPUT"
+      << std::endl
+      << DEBUG_PREFIX << "---------------------------------------------"
+      << std::endl;
+  std::cout << DEBUG_PREFIX << "Approx gradient wrt inputs:" << std::endl;
+  for (size_t s=0; s<approxGradientWrtInput.n_slices; s++)
+  {
+    std::cout << DEBUG_PREFIX << "Slice #" << s << std::endl;
+    for (size_t r=0; r<approxGradientWrtInput.slice(s).n_rows; r++)
+      std::cout << DEBUG_PREFIX << approxGradientWrtInput.slice(s).row(r);
+  }
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(BackwardPassBigTest)
@@ -153,10 +171,27 @@ BOOST_AUTO_TEST_CASE(BackwardPassBigTest)
     input[i] += disturbance;
   }
 
-  std::cout << "Approx gradient wrt inputs:" << std::endl;
-  std::cout << approxGradientWrtInput << std::endl;
+#if DEBUG
+  std::cout
+      << DEBUG_PREFIX << "---------------------------------------------"
+      << std::endl
+      << DEBUG_PREFIX << "BACKWARD PASS TEST (BackwardPassBigTest) DEBUG OUTPUT"
+      << std::endl
+      << DEBUG_PREFIX << "---------------------------------------------"
+      << std::endl;
+  std::cout << DEBUG_PREFIX << "Approx gradient wrt inputs:" << std::endl;
+  for (size_t s=0; s<approxGradientWrtInput.n_slices; s++)
+  {
+    std::cout << DEBUG_PREFIX << "Slice #" << s << std::endl;
+    for (size_t r=0; r<approxGradientWrtInput.slice(s).n_rows; r++)
+      std::cout << DEBUG_PREFIX << approxGradientWrtInput.slice(s).row(r);
+  }
+#endif
 
-  BOOST_REQUIRE(arma::approx_equal(gradInput, approxGradientWrtInput, "absdiff", disturbance));
+  BOOST_REQUIRE(arma::approx_equal(gradInput,
+                                   approxGradientWrtInput,
+                                   "absdiff",
+                                   disturbance));
 
   std::vector<arma::cube> approxGradientWrtFilters(2);
   approxGradientWrtFilters[0] = arma::zeros(3, 5, 3);
@@ -183,7 +218,11 @@ BOOST_AUTO_TEST_CASE(BackwardPassBigTest)
   }
 
   for (size_t fidx=0; fidx<2; fidx++)
-  {
-    BOOST_REQUIRE(arma::approx_equal(gradFilters[fidx], approxGradientWrtFilters[fidx], "absdiff", disturbance));
-  }
+    BOOST_REQUIRE(arma::approx_equal(gradFilters[fidx],
+                  approxGradientWrtFilters[fidx],
+                  "absdiff",
+                  disturbance));
 }
+
+#undef DEBUG
+#undef DEBUG_PREFIX

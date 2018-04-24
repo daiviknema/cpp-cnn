@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(SimpleNetworkTest)
     r.Forward(convOut, reluOut);
     d.Forward(reluOut, denseOut);
     s.Forward(denseOut, softmaxOut);
-    loss = l.Forward(softmaxOut, trainLabels[0]);
+    loss += l.Forward(softmaxOut, trainLabels[0]);
 
     // Backward pass through the first example.
     l.Backward();
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(SimpleNetworkTest)
     r.Forward(convOut, reluOut);
     d.Forward(reluOut, denseOut);
     s.Forward(denseOut, softmaxOut);
-    loss = l.Forward(softmaxOut, trainLabels[1]);
+    loss += l.Forward(softmaxOut, trainLabels[1]);
 
     // Backward pass through the second example.
     l.Backward();
@@ -124,7 +124,22 @@ BOOST_AUTO_TEST_CASE(SimpleNetworkTest)
     std::cout << DEBUG_PREFIX << "Epoch #" << epoch
         << "\tCross Entropy Loss: " << loss << std::endl;
 #endif
+    loss = 0.0;
   }
+#if DEBUG
+  // Let us have a look at the peridctions
+  c.Forward(trainData[0], convOut);
+  r.Forward(convOut, reluOut);
+  d.Forward(reluOut, denseOut);
+  s.Forward(denseOut, softmaxOut);
+  std::cout << DEBUG_PREFIX << softmaxOut.t();
+  c.Forward(trainData[1], convOut);
+  r.Forward(convOut, reluOut);
+  d.Forward(reluOut, denseOut);
+  s.Forward(denseOut, softmaxOut);
+  std::cout << DEBUG_PREFIX << softmaxOut.t();
+#endif
+
 }
 
 #undef DEBUG

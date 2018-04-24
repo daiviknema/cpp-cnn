@@ -83,3 +83,5 @@ I went to sleep last night.. I've decided to skip office today because I'm still
 [DEBUG INTEGRATION TEST ]       Epoch #8        Cross Entropy Loss: 0.0277985
 [DEBUG INTEGRATION TEST ]       Epoch #9        Cross Entropy Loss: 0.0250919
 ```
+
+I think I should document the code and make style fixes before I proceed with anything else.
