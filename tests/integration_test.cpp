@@ -1,12 +1,12 @@
 #define BOOST_TEST_MODULE IntegrationTests
 #define BOOST_TEST_DYN_LINK
 
-#include "../convolution_layer.hpp"
-#include "../max_pooling_layer.hpp"
-#include "../relu_layer.hpp"
-#include "../dense_layer.hpp"
-#include "../softmax_layer.hpp"
-#include "../cross_entropy_loss_layer.hpp"
+#include "../layers/convolution_layer.hpp"
+#include "../layers/max_pooling_layer.hpp"
+#include "../layers/relu_layer.hpp"
+#include "../layers/dense_layer.hpp"
+#include "../layers/softmax_layer.hpp"
+#include "../layers/cross_entropy_loss_layer.hpp"
 
 #include <iostream>
 #include <vector>

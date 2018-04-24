@@ -2,7 +2,7 @@
 #define BOOST_TEST_DYN_LINK
 
 #include <boost/test/unit_test.hpp>
-#include "../cross_entropy_loss_layer.hpp"
+#include "../layers/cross_entropy_loss_layer.hpp"
 
 BOOST_AUTO_TEST_CASE(ForwardPassTest)
 {

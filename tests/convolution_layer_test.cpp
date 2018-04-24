@@ -2,7 +2,7 @@
 #define BOOST_TEST_DYN_LINK
 
 #include <boost/test/unit_test.hpp>
-#include "../conv_layer.hpp"
+#include "../layers/convolution_layer.hpp"
 
 #define DEBUG false
 #define DEBUG_PREFIX "[CONV LAYER TESTS ]\t"
