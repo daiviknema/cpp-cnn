@@ -69,3 +69,17 @@ ReLU Done! All the components are done. I think I'll write some more tests to tr
 Actually, one component is still remains -- the loss layer. Imma have to implement cross entropy loss first
 
 Implemented cross entropy loss along with tests. Now we can move to the integration tests.
+
+I went to sleep last night.. I've decided to skip office today because I'm still a little bummed at the GSoC rejection. Anyway, the silver lining is that all my components seem to be working - I just wrote a simple network and ran it on two training examples for 10 epochs and the loss decreases beautifully:
+```
+[DEBUG INTEGRATION TEST ]       Epoch #0        Cross Entropy Loss: 0.482423
+[DEBUG INTEGRATION TEST ]       Epoch #1        Cross Entropy Loss: 0.121352
+[DEBUG INTEGRATION TEST ]       Epoch #2        Cross Entropy Loss: 0.0802145
+[DEBUG INTEGRATION TEST ]       Epoch #3        Cross Entropy Loss: 0.0604326
+[DEBUG INTEGRATION TEST ]       Epoch #4        Cross Entropy Loss: 0.0488966
+[DEBUG INTEGRATION TEST ]       Epoch #5        Cross Entropy Loss: 0.0410873
+[DEBUG INTEGRATION TEST ]       Epoch #6        Cross Entropy Loss: 0.0354383
+[DEBUG INTEGRATION TEST ]       Epoch #7        Cross Entropy Loss: 0.0311572
+[DEBUG INTEGRATION TEST ]       Epoch #8        Cross Entropy Loss: 0.0277985
+[DEBUG INTEGRATION TEST ]       Epoch #9        Cross Entropy Loss: 0.0250919
+```

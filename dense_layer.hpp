@@ -6,7 +6,7 @@
 #include <cmath>
 #include <cassert>
 
-#define DEBUG true
+#define DEBUG false
 #define DEBUG_PREFIX "[DEBUG DENSE LAYER ]\t"
 
 class DenseLayer
@@ -105,5 +105,8 @@ class DenseLayer
         );
   }
 };
+
+#undef DEBUG
+#undef DEBUG_PREFIX
 
 #endif

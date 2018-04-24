@@ -5,7 +5,7 @@
 #include <armadillo>
 #include <cassert>
 
-#define DEBUG true
+#define DEBUG false
 #define DEBUG_PREFIX "[DEBUG POOL LAYER ]\t"
 
 class MaxPoolingLayer
@@ -134,4 +134,6 @@ class MaxPoolingLayer
   arma::cube gradientWrtInput;
 };
 
+#undef DEBUG
+#undef DEBUG_PREFIX
 #endif

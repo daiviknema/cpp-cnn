@@ -7,7 +7,7 @@
 #include <cmath>
 #include <cassert>
 
-#define DEBUG true
+#define DEBUG false
 #define DEBUG_PREFIX "[DEBUG CONV LAYER ]\t"
 
 class ConvolutionLayer
@@ -238,4 +238,6 @@ class ConvolutionLayer
   std::vector<arma::cube> accumulatedGradFilters;
 };
 
+#undef DEBUG
+#undef DEBUG_PREFIX
 #endif
