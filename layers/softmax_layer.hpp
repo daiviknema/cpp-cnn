@@ -15,8 +15,8 @@ class SoftmaxLayer
 
   void Forward(arma::vec& input, arma::vec& output)
   {
-    double sumExp = arma::accu(arma::exp(input));
-    output = arma::exp(input)/sumExp;
+    double sumExp = arma::accu(arma::exp(input - arma::max(input)));
+    output = arma::exp(input - arma::max(input))/sumExp;
 
     this->input = input;
     this->output = output;

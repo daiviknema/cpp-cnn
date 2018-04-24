@@ -31,6 +31,7 @@ class MNISTData
       arma::cube img(28, 28, 1, arma::fill::zeros);
       for (size_t r=0; r<28; r++)
         img.slice(0).row(r) = trainDataRaw.row(idx).subvec(28*r+1, 28*r+28);
+      img.slice(0) = arma::normalise(img.slice(0));
       trainDataAll.push_back(img);
       arma::vec labelvec(10, arma::fill::zeros);
       labelvec(label) += 1.0;
@@ -56,6 +57,7 @@ class MNISTData
       arma::cube img(28, 28, 1, arma::fill::zeros);
       for (size_t r=0; r<28; r++)
         img.slice(0).row(r) = testDataRaw.row(idx).subvec(28*r, 28*r+27);
+      img.slice(0) = arma::normalise(img.slice(0));
       testData.push_back(img);
     }
   }
