@@ -40,5 +40,8 @@ BOOST_AUTO_TEST_CASE(BackwardPassTest)
     approxGradWrtInput[i] = (l1-l2)/(2.0*disturbance);
     input[i] += disturbance;
   }
-  BOOST_REQUIRE(arma::approx_equal(gradWrtInput, approxGradWrtInput, "absdiff", disturbance));
+  BOOST_REQUIRE(arma::approx_equal(gradWrtInput,
+                                   approxGradWrtInput,
+                                   "absdiff",
+                                   disturbance));
 }
