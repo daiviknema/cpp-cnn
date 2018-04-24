@@ -76,5 +76,8 @@ BOOST_AUTO_TEST_CASE(BackwardPassTest)
     input[i] += disturbance;
   }
 
-  BOOST_REQUIRE(arma::approx_equal(gradientWrtInput, approxGradientWrtInput, "absdiff", disturbance));
+  BOOST_REQUIRE(arma::approx_equal(gradientWrtInput,
+                                   approxGradientWrtInput,
+                                   "absdiff",
+                                   disturbance));
 }

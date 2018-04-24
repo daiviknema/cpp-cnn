@@ -100,16 +100,21 @@ class MaxPoolingLayer
     gradientWrtInput = arma::zeros(inputHeight, inputWidth, inputDepth);
     for (size_t i=0; i<inputDepth; i++)
     {
-      for (size_t r=0; r + poolingWindowHeight <= inputHeight; r += verticalStride)
+      for (size_t r=0;
+           r + poolingWindowHeight <= inputHeight;
+           r += verticalStride)
       {
-        for (size_t c=0; c + poolingWindowWidth <= inputWidth; c += horizontalStride)
+        for (size_t c=0;
+             c + poolingWindowWidth <= inputWidth;
+             c += horizontalStride)
         {
           arma::mat tmp(poolingWindowHeight,
                          poolingWindowWidth,
                          arma::fill::zeros);
           tmp(input.slice(i).submat(r, c,
                 r+poolingWindowHeight-1, c+poolingWindowWidth-1)
-                .index_max()) = upstreamGradient.slice(i)(r/verticalStride, c/horizontalStride);
+                .index_max()) = upstreamGradient.slice(i)(r/verticalStride,
+                                                          c/horizontalStride);
           gradientWrtInput.slice(i).submat(r, c,
               r+poolingWindowHeight-1, c+poolingWindowWidth-1) += tmp;
         }
