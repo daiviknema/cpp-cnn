@@ -66,7 +66,10 @@ BOOST_AUTO_TEST_CASE(BackwardPassTest)
     input[i] += disturbance;
   }
 
-  BOOST_REQUIRE(arma::approx_equal(gradWrtInput, approxGradWrtInput, "absdiff", disturbance));
+  BOOST_REQUIRE(arma::approx_equal(gradWrtInput,
+                                   approxGradWrtInput,
+                                   "absdiff",
+                                   disturbance));
 
   for (size_t i=0; i<weights.n_elem; i++)
   {
@@ -83,5 +86,8 @@ BOOST_AUTO_TEST_CASE(BackwardPassTest)
     d.setWeights(weights);
   }
 
-  BOOST_REQUIRE(arma::approx_equal(gradWrtWeights, approxGradWrtWeights, "absdiff", disturbance));
+  BOOST_REQUIRE(arma::approx_equal(gradWrtWeights,
+                                   approxGradWrtWeights,
+                                   "absdiff",
+                                   disturbance));
 }
