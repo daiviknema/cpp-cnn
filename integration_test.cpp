@@ -71,7 +71,8 @@ BOOST_AUTO_TEST_CASE(SimpleNetworkTest)
   double loss;
 
 
-  arma::vec gradWrtPredictedDistribution = l.getGradientWrtPredictedDistribution();
+  arma::vec gradWrtPredictedDistribution =
+      l.getGradientWrtPredictedDistribution();
   arma::vec gradWrtSoftmaxInput;
   arma::cube gradWrtDenseInput;
   arma::cube gradWrtReluInput;
