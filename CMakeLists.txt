@@ -78,3 +78,16 @@ add_executable(
 
 target_link_libraries(mnist_util_test LINK_PUBLIC ${Boost_LIBRARIES})
 target_link_libraries(mnist_util_test LINK_PUBLIC ${ARMADILLO_LIBRARIES})
+
+add_executable(
+  le_net
+  le_net.cpp
+  )
+
+
+target_link_libraries(le_net LINK_PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(le_net LINK_PUBLIC ${ARMADILLO_LIBRARIES})
+
+file(COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/data_small DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
