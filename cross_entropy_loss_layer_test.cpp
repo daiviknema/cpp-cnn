@@ -29,7 +29,8 @@ BOOST_AUTO_TEST_CASE(BackwardPassTest)
 
   c.Backward();
 
-  arma::vec gradientWrtPredictedDistribution = c.getGradientWrtPredictedDistribution();
+  arma::vec gradientWrtPredictedDistribution =
+      c.getGradientWrtPredictedDistribution();
   arma::vec approxGradient = arma::zeros(arma::size(predictedDistribution));
 
   double disturbance = 0.5e-5;
@@ -43,5 +44,8 @@ BOOST_AUTO_TEST_CASE(BackwardPassTest)
     predictedDistribution[i] += disturbance;
   }
 
-  BOOST_REQUIRE(arma::approx_equal(approxGradient, gradientWrtPredictedDistribution, "absdiff", disturbance));
+  BOOST_REQUIRE(arma::approx_equal(approxGradient,
+                                   gradientWrtPredictedDistribution,
+                                   "absdiff",
+                                   disturbance));
 }

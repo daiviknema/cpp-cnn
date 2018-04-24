@@ -13,31 +13,39 @@ class CrossEntropyLossLayer
     // Nothing to do here.
   }
 
-  double Forward(arma::vec& predictedDistribution, arma::vec& actualDistribution)
+  double Forward(arma::vec& predictedDistribution,
+                 arma::vec& actualDistribution)
   {
     assert(predictedDistribution.n_elem == numInputs);
     assert(actualDistribution.n_elem == numInputs);
 
+    // Cache the prdicted and actual labels -- these will be required in the
+    // backward pass.
     this->predictedDistribution = predictedDistribution;
     this->actualDistribution = actualDistribution;
 
-    this->loss = -arma::dot(actualDistribution, arma::log(predictedDistribution));
+    // Compute the loss and cache that too.
+    this->loss = -arma::dot(actualDistribution,
+                            arma::log(predictedDistribution));
     return this->loss;
   }
 
   void Backward()
   {
-    gradientWrtPredictedDistribution = -(actualDistribution % (1/predictedDistribution));
+    gradientWrtPredictedDistribution =
+        -(actualDistribution % (1/predictedDistribution));
   }
 
   arma::vec getGradientWrtPredictedDistribution()
   {
     return gradientWrtPredictedDistribution;
   }
+
  private:
   size_t numInputs;
   arma::vec predictedDistribution;
   arma::vec actualDistribution;
+
   double loss;
 
   arma::vec gradientWrtPredictedDistribution;
