@@ -85,3 +85,9 @@ I went to sleep last night.. I've decided to skip office today because I'm still
 ```
 
 I think I should document the code and make style fixes before I proceed with anything else.
+
+Okay, I've refactored the code and made a bunch of style fixes and added comments (sparingly). Also, I've added a cmake configuration to easily build everything and make things cross-platform. Now for the part that I've been putting off from the very beginning: parsing the binary MNIST data.
+
+I've just realized that the digit recognizer challenge on Kaggle has csv datasets for digit recognition. Those might be easier to parse.
+
+Done with the data parsing module. Now for the big sausage - LeNet. Oh yeah, minor note -- anyone attempting to run this code will have to download the Kaggle dataset into a `data/` directory.

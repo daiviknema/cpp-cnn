@@ -69,3 +69,12 @@ add_executable(
 
 target_link_libraries(integration_test LINK_PUBLIC ${Boost_LIBRARIES})
 target_link_libraries(integration_test LINK_PUBLIC ${ARMADILLO_LIBRARIES})
+
+add_executable(
+  mnist_util_test
+  tests/mnist_test.cpp
+  )
+
+
+target_link_libraries(mnist_util_test LINK_PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(mnist_util_test LINK_PUBLIC ${ARMADILLO_LIBRARIES})
