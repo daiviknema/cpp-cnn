@@ -91,3 +91,9 @@ Okay, I've refactored the code and made a bunch of style fixes and added comment
 I've just realized that the digit recognizer challenge on Kaggle has csv datasets for digit recognition. Those might be easier to parse.
 
 Done with the data parsing module. Now for the big sausage - LeNet. Oh yeah, minor note -- anyone attempting to run this code will have to download the Kaggle dataset into a `data/` directory.
+
+Okay, so I've assembled the Le Net - but there seems to be a very strange issue.. The training loss decreses over epochs, so does the validation loss - all good, right? Wrong! The training and validation accuracies are also decresing over epochs! FTW!!! Go home CNN, you're drunk! What is strange is that I can't seem to get the model to overfit on a smaller sub-dataset either. I think its time to write another integration test.
+
+I might've made some headway into the issue - it looks like the input to the loss layer is very very close to a one-hot vector which is causing infinities and negative infinities to appear. Need to find some way to make this numerically stable. Okay, a little googling around has shown that if we combine the softmax and cross entropy layers then the backward gradient becomes numerically stable. So, we will do that now.
+
+It's not working at all. Need to start fresh.
