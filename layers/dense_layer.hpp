@@ -25,6 +25,9 @@ class DenseLayer
     weights = arma::zeros(numOutputs, inputHeight*inputWidth*inputDepth);
     weights.imbue( [&]() { return _getTruncNormalVal(0.0, 1.0); } );
 
+    // Initialize the biases
+    biases = arma::zeros(numOutputs);
+
     // Reset accumulated gradients.
     _resetAccumulatedGradients();
   }
@@ -32,7 +35,7 @@ class DenseLayer
   void Forward(arma::cube& input, arma::vec& output)
   {
     arma::vec flatInput = arma::vectorise(input);
-    output = weights * flatInput;
+    output = (weights * flatInput) + biases;
 
     this->input = input;
     this->output = output;
@@ -51,14 +54,18 @@ class DenseLayer
 
     gradWeights = arma::zeros(arma::size(weights));
     for (size_t i=0; i<gradWeights.n_rows; i++)
-      gradWeights.row(i) = vectorise(input).t();
+      gradWeights.row(i) = vectorise(input).t() * upstreamGradient[i];
 
     accumulatedGradWeights += gradWeights;
+
+    gradBiases = upstreamGradient;
+    accumulatedGradBiases += gradBiases;
   }
 
-  void UpdateWeights(size_t batchSize, double learningRate)
+  void UpdateWeightsAndBiases(size_t batchSize, double learningRate)
   {
     weights = weights - learningRate * (accumulatedGradWeights/batchSize);
+    biases = biases - learningRate * (accumulatedGradBiases/batchSize);
     _resetAccumulatedGradients();
   }
 
@@ -66,9 +73,15 @@ class DenseLayer
 
   arma::cube getGradientWrtInput() { return gradInput; }
 
+  arma::vec getGradientWrtBiases() { return gradBiases; }
+
   arma::mat getWeights() { return weights; }
 
+  arma::vec getBiases() { return biases; }
+
   void setWeights(arma::mat weights) { this->weights = weights; }
+
+  void setBiases(arma::vec biases) { this->biases = biases; }
 
  private:
   size_t inputHeight;
@@ -80,12 +93,15 @@ class DenseLayer
   arma::vec output;
 
   arma::mat weights;
+  arma::vec biases;
 
   arma::cube gradInput;
   arma::mat gradWeights;
+  arma::vec gradBiases;
 
   arma::cube accumulatedGradInput;
   arma::mat accumulatedGradWeights;
+  arma::vec accumulatedGradBiases;
 
   double _getTruncNormalVal(double mean, double variance)
   {
@@ -103,6 +119,7 @@ class DenseLayer
         numOutputs,
         inputHeight*inputWidth*inputDepth
         );
+    accumulatedGradBiases = arma::zeros(numOutputs);
   }
 };
 

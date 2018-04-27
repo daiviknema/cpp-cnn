@@ -9,7 +9,7 @@
 class MNISTData
 {
  public:
-  MNISTData(std::string dataDir, double splitRatio)
+  MNISTData(std::string dataDir, double splitRatio = 0.9)
   {
     assert(splitRatio <= 1 && splitRatio >= 0);
     this->dataDir = dataDir;
@@ -57,7 +57,7 @@ class MNISTData
       arma::cube img(28, 28, 1, arma::fill::zeros);
       for (size_t r=0; r<28; r++)
         img.slice(0).row(r) = testDataRaw.row(idx).subvec(28*r, 28*r+27);
-      img.slice(0) = arma::normalise(img.slice(0));
+      img.slice(0) /= 255.0;
       testData.push_back(img);
     }
   }

@@ -8,6 +8,8 @@
 #include "../layers/softmax_layer.hpp"
 #include "../layers/cross_entropy_loss_layer.hpp"
 
+#include "../utils/mnist.hpp"
+
 #include <iostream>
 #include <vector>
 #include <cassert>
@@ -118,7 +120,7 @@ BOOST_AUTO_TEST_CASE(SimpleNetworkTest)
     gradWrtConvInput = c.getGradientWrtInput();
 
     // Update weights.
-    d.UpdateWeights(2, 0.1);
+    d.UpdateWeightsAndBiases(2, 0.1);
     c.UpdateFilterWeights(2, 0.1);
 
 #if DEBUG
@@ -141,6 +143,169 @@ BOOST_AUTO_TEST_CASE(SimpleNetworkTest)
   std::cout << DEBUG_PREFIX << softmaxOut.t();
 #endif
 
+}
+
+BOOST_AUTO_TEST_CASE(SmallANDNetwork)
+{
+  std::vector<arma::cube> trainData(4, arma::cube(2, 1, 1, arma::fill::zeros));
+  trainData[1].slice(0).col(0) = arma::vec({1, 0});
+  trainData[2].slice(0).col(0) = arma::vec({0, 1});
+  trainData[3].slice(0).col(0) = arma::vec({1, 1});
+
+  std::vector<arma::vec> trainLabels(4);
+  trainLabels[0] = {1, 0};
+  trainLabels[1] = {1, 0};
+  trainLabels[2] = {1, 0};
+  trainLabels[3] = {0, 1};
+
+  DenseLayer d(2, 1, 1, 2);
+  SoftmaxLayer s(2);
+  CrossEntropyLossLayer l(2);
+
+  arma::vec dOut = arma::zeros(2);
+  arma::vec sOut = arma::zeros(2);
+  double loss = 0.0;
+
+  for (size_t epoch = 0; epoch < 1000; epoch ++)
+  {
+    loss = 0.0;
+    for (size_t i=0; i<4; i++)
+    {
+      d.Forward(trainData[i], dOut);
+      s.Forward(dOut, sOut);
+      loss += l.Forward(sOut, trainLabels[i]);
+
+      std::cout << DEBUG_PREFIX << std::endl;
+      std::cout << DEBUG_PREFIX << "Input: " << trainData[i].slice(0).col(0).t();
+      std::cout << DEBUG_PREFIX << "Target: " << trainLabels[i].t();
+      std::cout << DEBUG_PREFIX << "Predicted: " << sOut.t();
+
+      l.Backward();
+      arma::vec gradWrtPredictedDistribution = l.getGradientWrtPredictedDistribution();
+      s.Backward(gradWrtPredictedDistribution);
+      arma::vec gradWrtSIn = s.getGradientWrtInput();
+      d.Backward(gradWrtSIn);
+      arma::vec gradWrtDin = d.getGradientWrtInput();
+      arma::mat gradWrtWeights = d.getGradientWrtWeights();
+
+      std::cout << DEBUG_PREFIX << "Gradient wrt weights:" << std::endl;
+      std::cout << gradWrtWeights << std::endl;
+    }
+    std::cout << DEBUG_PREFIX << "Weights before update:" << std::endl;
+    std::cout << d.getWeights() << std::endl;
+    std::cout << DEBUG_PREFIX << "Biases before update:" << std::endl;
+    std::cout << d.getBiases() << std::endl;
+    d.UpdateWeightsAndBiases(4, 0.1);
+    std::cout << DEBUG_PREFIX << "Weights after update:" << std::endl;
+    std::cout << d.getWeights() << std::endl;
+    std::cout << DEBUG_PREFIX << "Biases after update:" << std::endl;
+    std::cout << d.getBiases() << std::endl;
+    std::cout << DEBUG_PREFIX << "Loss after epoch #" << epoch << ": " << loss << std::endl;
+  }
+  // Now we check the predictions
+  for (size_t i=0; i<4; i++)
+  {
+    d.Forward(trainData[i], dOut);
+    s.Forward(dOut, sOut);
+
+    std::cout << DEBUG_PREFIX << std::endl;
+    std::cout << DEBUG_PREFIX << "Input: " << arma::vectorise(trainData[i]).t();
+    std::cout << DEBUG_PREFIX << "Prediction: " << sOut.t();
+    std::cout << DEBUG_PREFIX << std::endl;
+  }
+}
+
+BOOST_AUTO_TEST_CASE(MNISTSmallDenseNetworkTest)
+{
+  MNISTData md("../data_small");
+
+  std::vector<arma::cube> trainData = md.getTrainData();
+  std::vector<arma::vec> trainLabels = md.getTrainLabels();
+
+  std::vector<arma::cube> validationData = md.getValidationData();
+  std::vector<arma::vec> validationLabels = md.getValidationLabels();
+
+  const size_t TRAINING_DATA_SIZE = trainData.size();
+  const size_t VALIDATION_DATA_SIZE = validationData.size();
+
+  std::cout << "Training Data size: " << TRAINING_DATA_SIZE << std::endl;
+  std::cout << "Validation Data size: " << VALIDATION_DATA_SIZE << std::endl;
+
+  DenseLayer d(28, 28, 1, 10);
+  SoftmaxLayer s(10);
+  CrossEntropyLossLayer l(10);
+
+  arma::vec dOut = arma::zeros(10);
+  arma::vec sOut = arma::zeros(10);
+
+  arma::mat oldWts = arma::zeros(10, 28*28*1);
+  arma::mat newWts = arma::zeros(10, 28*28*1);
+
+  arma::vec oldDOut = arma::zeros(10);
+  arma::vec newDOut = arma::zeros(10);
+
+  arma::vec oldSOut = arma::zeros(10);
+  arma::vec newSOut = arma::zeros(10);
+
+  // Forward pass the first training example.
+  for (size_t epoch = 0; epoch < 100; epoch++)
+  {
+    oldDOut = dOut;
+    d.Forward(trainData[0], dOut);
+    newDOut = dOut;
+    BOOST_REQUIRE(!arma::approx_equal(oldDOut, newDOut, "absdiff", 0.0));
+
+    oldSOut = sOut;
+    s.Forward(dOut, sOut);
+    newSOut = sOut;
+    BOOST_REQUIRE(!arma::approx_equal(oldSOut, newSOut, "absdiff", 0.0));
+    std::cout << DEBUG_PREFIX << "Old softmax output:" << std::endl;
+    std::cout << oldSOut << std::endl;
+    std::cout << DEBUG_PREFIX << "New softmax output:" << std::endl;
+    std::cout << newSOut << std::endl;
+
+    double loss = l.Forward(sOut, trainLabels[0]);
+
+    // std::cout << DEBUG_PREFIX << "Input to dense layer:" << std::endl;
+    // std::cout << trainData[0] << std::endl;
+
+    // std::cout << DEBUG_PREFIX << "Weights of dense layer:" << std::endl;
+    // std::cout << d.getWeights() << std::endl;
+
+    // std::cout << DEBUG_PREFIX << "Output of dense layer:" << std::endl;
+    // std::cout << sOut << std::endl;
+
+    std::cout << DEBUG_PREFIX << "Loss: " << loss << std::endl;
+
+    l.Backward();
+    arma::vec gradWrtPredictedDistribution = l.getGradientWrtPredictedDistribution();
+
+    // std::cout << DEBUG_PREFIX << "Gradient wrt predicted distribution:" << std::endl;
+    // std::cout << gradWrtPredictedDistribution << std::endl;
+
+    s.Backward(gradWrtPredictedDistribution);
+    arma::vec gradWrtSIn = s.getGradientWrtInput();
+
+    // std::cout << DEBUG_PREFIX << "Gradient wrt softmax input:"  << std::endl;
+    // std::cout << gradWrtSIn << std::endl;
+
+    d.Backward(gradWrtSIn);
+    arma::mat gradWrtWts = d.getGradientWrtWeights();
+
+    // std::cout << DEBUG_PREFIX << "Gradient wrt dense weights:" << std::endl;
+    // std::cout << gradWrtWts << std::endl;
+
+    oldWts = d.getWeights();
+    d.UpdateWeightsAndBiases(1, 0.1);
+    newWts = d.getWeights();
+    BOOST_REQUIRE(!arma::approx_equal(oldWts, newWts, "absdiff", 0.0));
+  }
+
+  std::cout << DEBUG_PREFIX << std::endl;
+  d.Forward(trainData[0], dOut);
+  s.Forward(dOut, sOut);
+  std::cout << DEBUG_PREFIX << "Actual output: " << trainLabels[0].t();
+  std::cout << DEBUG_PREFIX << "Predicted output: " << sOut.t();
 }
 
 #undef DEBUG
