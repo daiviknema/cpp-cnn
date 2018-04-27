@@ -308,5 +308,114 @@ BOOST_AUTO_TEST_CASE(MNISTSmallDenseNetworkTest)
   std::cout << DEBUG_PREFIX << "Predicted output: " << sOut.t();
 }
 
+BOOST_AUTO_TEST_CASE(NowWereGettingSomewhereTest)
+{
+  MNISTData md("../data_medium");
+
+  std::vector<arma::cube> trainData = md.getTrainData();
+  std::vector<arma::vec> trainLabels = md.getTrainLabels();
+
+  std::vector<arma::cube> validationData = md.getValidationData();
+  std::vector<arma::vec> validationLabels = md.getValidationLabels();
+
+  std::cout << DEBUG_PREFIX << "Size of training set: " << trainData.size() << std::endl;
+  BOOST_REQUIRE_EQUAL(trainData.size(), trainLabels.size());
+  std::cout << DEBUG_PREFIX << "Size of validation set: " << validationData.size() << std::endl;
+  BOOST_REQUIRE_EQUAL(validationData.size(), validationLabels.size());
+
+  // Define the network
+  // conv - relu - maxpool - dense - softmax - loss
+
+  ConvolutionLayer c(
+      28,
+      28,
+      1,
+      7,
+      7,
+      1,
+      1,
+      3);
+  // Output is 22 x 22 x 3
+  ReLULayer r(
+      22,
+      22,
+      3);
+  // Output is 22 x 22 x 3
+  MaxPoolingLayer m(
+      22,
+      22,
+      3,
+      2,
+      2,
+      2,
+      2);
+  // Output is 11 x 11 x 3
+  DenseLayer d(
+      11,
+      11,
+      3,
+      10);
+  // Output is a vector of size 10
+  SoftmaxLayer s(10);
+  // Output is a vector of size 10
+  CrossEntropyLossLayer l(10);
+
+  arma::cube cOut = arma::zeros(22, 22, 3);
+  arma::cube rOut = arma::zeros(22, 22, 3);
+  arma::cube mOut = arma::zeros(11, 11, 3);
+  arma::vec dOut = arma::zeros(10);
+  arma::vec sOut = arma::zeros(10);
+  double loss = 0.0;
+  // We'll use stochastic gradient descent
+  for (size_t epoch = 0; epoch < 10; epoch++)
+  {
+    double averageLoss = 0.0;
+    for(size_t i=0; i<trainData.size(); i++)
+    {
+      c.Forward(trainData[i], cOut);
+      r.Forward(cOut, rOut);
+      m.Forward(rOut, mOut);
+      d.Forward(mOut, dOut);
+      s.Forward(dOut, sOut);
+
+      loss = l.Forward(sOut, trainLabels[i]);
+      averageLoss += loss;
+
+      l.Backward();
+      arma::vec gradWrtPredictedDistribution = l.getGradientWrtPredictedDistribution();
+      s.Backward(gradWrtPredictedDistribution);
+      arma::vec gradWrtSIn = s.getGradientWrtInput();
+      d.Backward(gradWrtSIn);
+      arma::cube gradWrtDIn = d.getGradientWrtInput();
+      m.Backward(gradWrtDIn);
+      arma::cube gradWrtMIn = m.getGradientWrtInput();
+      r.Backward(gradWrtMIn);
+      arma::cube gradWrtRIn = r.getGradientWrtInput();
+      c.Backward(gradWrtRIn);
+      arma::cube gradWrtCIn = c.getGradientWrtInput();
+
+      d.UpdateWeightsAndBiases(1, 0.1);
+      c.UpdateFilterWeights(1, 0.1);
+    }
+    averageLoss /= trainData.size();
+    std::cout << DEBUG_PREFIX << "Average loss: " << averageLoss << std::endl;
+    // Compute the validation accuracy
+    double correct = 0.0;
+    for (size_t i=0; i<validationData.size(); i++)
+    {
+      c.Forward(validationData[i], cOut);
+      r.Forward(cOut, rOut);
+      m.Forward(rOut, mOut);
+      d.Forward(mOut, dOut);
+      s.Forward(dOut, sOut);
+
+      if (sOut.index_max() == validationLabels[i].index_max())
+        correct += 1.0;
+    }
+    std::cout << DEBUG_PREFIX << "Validation Accuracy: " << correct/validationData.size() << std::endl;
+    std::cout << DEBUG_PREFIX << std::endl;
+  }
+}
+
 #undef DEBUG
 #undef DEBUG_PREFIX

@@ -97,3 +97,47 @@ Okay, so I've assembled the Le Net - but there seems to be a very strange issue.
 I might've made some headway into the issue - it looks like the input to the loss layer is very very close to a one-hot vector which is causing infinities and negative infinities to appear. Need to find some way to make this numerically stable. Okay, a little googling around has shown that if we combine the softmax and cross entropy layers then the backward gradient becomes numerically stable. So, we will do that now.
 
 It's not working at all. Need to start fresh.
+
+Okay, so I've written a few more integration tests and here is what I've found:
+- The backward pass through the dense layer was slightly incorrect. I'd forgotten to incorporate the upstreamGradient into the gradients wrt weights.
+- The dense layer was also missing biases. I've added these now.
+With these changes, I can train simple networks for:
+- learning the AND decision boundary
+- learning a single MNIST image
+- On a sample of 3000 MNIST images, a simple convnet (conv-relu-maxpool-dense-softmax-cross_entropy schema) can be trained with SGD to obtain the following results:
+```
+[DEBUG INTEGRATION TEST ]	Size of training set: 2700
+[DEBUG INTEGRATION TEST ]	Size of validation set: 300
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 2.22893
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.406667
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 1.33203
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.676667
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.841367
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.753333
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.584995
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.79
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.44068
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.813333
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.360519
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.81
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.294253
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.84
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.265645
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.83
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.220504
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.863333
+[DEBUG INTEGRATION TEST ]
+[DEBUG INTEGRATION TEST ]	Average loss: 0.164675
+[DEBUG INTEGRATION TEST ]	Validation Accuracy: 0.863333
+```
+
+which is reassuring ... I think we should be good to go on LeNet now.
