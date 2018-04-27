@@ -141,3 +141,72 @@ With these changes, I can train simple networks for:
 ```
 
 which is reassuring ... I think we should be good to go on LeNet now.
+
+Fuck yeah .. LeNet is working on the medium sozed dataset:
+```
+[DEBUG LE NET ] Training data size: 2700
+[DEBUG LE NET ] Validation data size: 300
+[DEBUG LE NET ] Test data size: 10
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #0: 0.578797
+[DEBUG LE NET ] Val accuracy: 0.886667
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #1: 0.181674
+[DEBUG LE NET ] Val accuracy: 0.936667
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #2: 0.155978
+[DEBUG LE NET ] Val accuracy: 0.913333
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #3: 0.0978818
+[DEBUG LE NET ] Val accuracy: 0.956667
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #4: 0.0800541
+[DEBUG LE NET ] Val accuracy: 0.953333
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #5: 0.0567186
+[DEBUG LE NET ] Val accuracy: 0.936667
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #6: 0.0514032
+[DEBUG LE NET ] Val accuracy: 0.916667
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #7: 0.0396252
+[DEBUG LE NET ] Val accuracy: 0.926667
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #8: 0.0444968
+[DEBUG LE NET ] Val accuracy: 0.933333
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #9: 0.0350243
+[DEBUG LE NET ] Val accuracy: 0.93
+```
+For future reference -- these results were obtained with the following hyperparameter settings:
+- Learning rate: 0.05
+- Epochs: 10
+- Batch Size: 10
+- Train data: data_medium
+Oh, and there's one more thing.. I noticed earlier that the output of the dense layer is quite high -- of the order of 1e2. Clearly too high for the softmax to give meaningful outputs. So, I've scaled the input to the softmax by 1e2. This is hacky, and I should probably figure out a cleaner way to do this. Maybe normalize the input differently?.. I think I might try to make the input have zero mean and unit variance and try - but for now I think the scaling is fine.
+
+Now for the mother lode... the complete Kaggle dataset
+
+OMFG!!!! IT WOOORRKKSS!!!!
+It's completed 5 epochs:
+```
+[DEBUG LE NET ] Training data size: 37800
+[DEBUG LE NET ] Validation data size: 4200
+[DEBUG LE NET ] Test data size: 28000
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #0: 0.189032
+[DEBUG LE NET ] Val accuracy: 0.960952
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #1: 0.102551
+[DEBUG LE NET ] Val accuracy: 0.966905
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #2: 0.0846397
+[DEBUG LE NET ] Val accuracy: 0.971905
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #3: 0.0762915
+[DEBUG LE NET ] Val accuracy: 0.97119
+[DEBUG LE NET ]
+[DEBUG LE NET ] Loss after epoch #4: 0.0741992
+[DEBUG LE NET ] Val accuracy: 0.975714
+```
+I think that this is not bad at all for a handwritten CNN. It takes a long time to run (~20 minutes per epoch on my shitty machine), but then again - handwritten. I'm going to stop the execution now and save the results and make the debug output prettier. For future reference: I did not change the hyperparameters from the previous run -- only the dataset was expanded to the original size.
