@@ -18,7 +18,7 @@
 
 int main(int argc, char ** argv)
 {
-  MNISTData md("../data_medium");
+  MNISTData md("../data");
 
   std::vector<arma::cube> trainData = md.getTrainData();
   std::vector<arma::vec> trainLabels = md.getTrainLabels();
