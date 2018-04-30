@@ -13,7 +13,7 @@ You'll probably need
 - Armadillo >= 8.300.4
 - Boost unit test framework (Boost version >= 1.58)
 
-to run everything in this repo. I've only tried to run this on a linux system (Ubuntu 16.04) -- but I dont see any obvious reason why it shouldn't work on other platforms as long as you have the dependencies installed.
+to run everything in this repo. I've only tried to run this on a Linux system (Ubuntu 16.04) -- but I dont see any obvious reason why it shouldn't work on other platforms as long as you have the dependencies installed.
 
 You will also need the Kaggle Digit recognizer dataset - which can be downloaded from [here](https://www.kaggle.com/c/digit-recognizer/data)
 
@@ -22,7 +22,7 @@ You will also need the Kaggle Digit recognizer dataset - which can be downloaded
 1. Clone this repository. `git clone https://github.com/plantsandbuildings/cpp-cnn`
 2. `cd` into the project root (`cd cpp-cnn`) and create the build and data directories using `mkdir build data`.
 3. Copy the Kaggle Digit Recognizer dataset into the `data` directory. The `data` directory should now contain two CSV files -- `train.csv` and `test.csv`.
-4. `cd` into the build directory (`cd build`) and configure the build using `cmake ..`. This will generate the Makefile to build the project.
+4. `cd` into the build directory (`cd build`) and configure the build using `cmake ../` This will generate a `Makefile` to build the project.
 5. Run `make` to build the project. Binaries are written to `build/bin`.
 6. Train the model on the Kaggle data using `bin/le_net`.
 
