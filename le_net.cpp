@@ -18,7 +18,8 @@
 
 int main(int argc, char ** argv)
 {
-  MNISTData md("../data");
+  // Read the Kaggle data
+  MNISTData md("../data_small");
 
   std::vector<arma::cube> trainData = md.getTrainData();
   std::vector<arma::vec> trainLabels = md.getTrainLabels();
@@ -31,10 +32,15 @@ int main(int argc, char ** argv)
 
   std::vector<arma::cube> testData = md.getTestData();
 
-  std::cout << DEBUG_PREFIX << "Training data size: " << trainData.size() << std::endl;
-  std::cout << DEBUG_PREFIX << "Validation data size: " << validationData.size() << std::endl;
-  std::cout << DEBUG_PREFIX << "Test data size: " << testData.size() << std::endl;
+#if DEBUG
+  std::cout << DEBUG_PREFIX
+      << "Training data size: " << trainData.size() << std::endl;
+  std::cout << DEBUG_PREFIX
+      << "Validation data size: " << validationData.size() << std::endl;
+  std::cout << DEBUG_PREFIX
+      << "Test data size: " << testData.size() << std::endl;
   std::cout << DEBUG_PREFIX << std::endl;
+#endif
 
   const size_t TRAIN_DATA_SIZE = trainData.size();
   const size_t VALIDATION_DATA_SIZE = validationData.size();
@@ -55,11 +61,13 @@ int main(int argc, char ** argv)
       1,
       6);
   // Output is 24 x 24 x 6
+
   ReLULayer r1(
       24,
       24,
       6);
   // Output is 24 x 24 x 6
+
   MaxPoolingLayer mp1(
       24,
       24,
@@ -69,6 +77,7 @@ int main(int argc, char ** argv)
       2,
       2);
   // Output is 12 x 12 x 6
+
   ConvolutionLayer c2(
       12,
       12,
@@ -79,11 +88,13 @@ int main(int argc, char ** argv)
       1,
       16);
   // Output is 8 x 8 x 16
+
   ReLULayer r2(
       8,
       8,
       16);
   // Output is 8 x 8 x 16
+
   MaxPoolingLayer mp2(
       8,
       8,
@@ -93,16 +104,21 @@ int main(int argc, char ** argv)
       2,
       2);
   // Output is 4 x 4 x 16
+
   DenseLayer d(
       4,
       4,
       16,
       10);
   // Output is a vector of size 10
+
   SoftmaxLayer s(10);
   // Output is a vector of size 10
+
   CrossEntropyLossLayer l(10);
 
+  // Initialize armadillo structures to store intermediate outputs (Ie. outputs
+  // of hidden layers)
   arma::cube c1Out = arma::zeros(24, 24, 6);
   arma::cube r1Out = arma::zeros(24, 24, 6);
   arma::cube mp1Out = arma::zeros(12, 12, 6);
@@ -112,19 +128,24 @@ int main(int argc, char ** argv)
   arma::vec dOut = arma::zeros(10);
   arma::vec sOut = arma::zeros(10);
 
+  // Initialize loss and cumulative loss. Cumulative loss totals loss over all
+  // training examples in a minibatch.
   double loss = 0.0;
   double cumLoss = 0.0;
 
 
   for (size_t epoch = 0; epoch < EPOCHS; epoch++)
   {
+#if DEBUG
     std::cout << DEBUG_PREFIX << std::endl;
     std::cout << DEBUG_PREFIX << "Epoch # " << epoch << std::endl;
+#endif
     for (size_t batchIdx = 0; batchIdx < NUM_BATCHES; batchIdx++)
     {
       // Generate a random batch.
       arma::vec batch(BATCH_SIZE, arma::fill::randu);
       batch *= (TRAIN_DATA_SIZE - 1);
+
       for (size_t i = 0; i < BATCH_SIZE; i++)
       {
         // Forward pass
@@ -137,11 +158,15 @@ int main(int argc, char ** argv)
         d.Forward(mp2Out, dOut);
         dOut /= 100;
         s.Forward(dOut, sOut);
+
+        // Compute the loss
         loss = l.Forward(sOut, trainLabels[batch[i]]);
         cumLoss += loss;
+
         // Backward pass
         l.Backward();
-        arma::vec gradWrtPredictedDistribution = l.getGradientWrtPredictedDistribution();
+        arma::vec gradWrtPredictedDistribution =
+            l.getGradientWrtPredictedDistribution();
         s.Backward(gradWrtPredictedDistribution);
         arma::vec gradWrtSIn = s.getGradientWrtInput();
         d.Backward(gradWrtSIn);
@@ -159,14 +184,20 @@ int main(int argc, char ** argv)
         c1.Backward(gradWrtR1In);
         arma::cube gradWrtC1In = c1.getGradientWrtInput();
       }
+
       // Update params
       d.UpdateWeightsAndBiases(BATCH_SIZE, LEARNING_RATE);
       c1.UpdateFilterWeights(BATCH_SIZE, LEARNING_RATE);
       c2.UpdateFilterWeights(BATCH_SIZE, LEARNING_RATE);
     }
-    // Output loss after epoch
+
+#if DEBUG
+    // Output loss on training dataset after each epoch
     std::cout << DEBUG_PREFIX << std::endl;
-    std::cout << DEBUG_PREFIX << "Training loss: "<< cumLoss / (BATCH_SIZE * NUM_BATCHES) << std::endl;
+    std::cout << DEBUG_PREFIX << "Training loss: "
+        << cumLoss / (BATCH_SIZE * NUM_BATCHES) << std::endl;
+#endif
+
     // Compute the training accuracy after epoch
     double correct = 0.0;
     for (size_t i = 0; i < TRAIN_DATA_SIZE; i++)
@@ -185,7 +216,12 @@ int main(int argc, char ** argv)
       if (trainLabels[i].index_max() == sOut.index_max())
         correct += 1.0;
     }
-    std::cout << DEBUG_PREFIX << "Training accuracy: " << correct/TRAIN_DATA_SIZE << std::endl;
+
+#if DEBUG
+    // Output accuracy on training dataset after each epoch
+    std::cout << DEBUG_PREFIX
+        << "Training accuracy: " << correct/TRAIN_DATA_SIZE << std::endl;
+#endif
 
     // Compute validation accuracy after epoch
     cumLoss = 0.0;
@@ -208,14 +244,26 @@ int main(int argc, char ** argv)
       if (validationLabels[i].index_max() == sOut.index_max())
         correct += 1.0;
     }
-    std::cout << DEBUG_PREFIX << "Validation loss: "<< cumLoss / (BATCH_SIZE * NUM_BATCHES) << std::endl;
-    std::cout << DEBUG_PREFIX << "Val accuracy: " << correct/VALIDATION_DATA_SIZE << std::endl;
-    std::cout << DEBUG_PREFIX << std::endl;
 
+#if DEBUG
+    // Output validation loss after each epoch
+    std::cout << DEBUG_PREFIX
+        << "Validation loss: " << cumLoss / (BATCH_SIZE * NUM_BATCHES)
+        << std::endl;
+
+    // Output validation accuracy after each epoch
+    std::cout << DEBUG_PREFIX
+        << "Val accuracy: " << correct / VALIDATION_DATA_SIZE << std::endl;
+    std::cout << DEBUG_PREFIX << std::endl;
+#endif
+
+    // Reset cumulative loss and correct count
     cumLoss = 0.0;
     correct = 0.0;
 
-    std::fstream fout("results_epoch_"+std::to_string(epoch), std::ios::out);
+    // Write results on test data to results csv
+    std::fstream fout("results_epoch_" + std::to_string(epoch) + ".csv",
+                      std::ios::out);
     fout << "ImageId,Label" << std::endl;
     for (size_t i=0; i<TEST_DATA_SIZE; i++)
     {
@@ -230,7 +278,8 @@ int main(int argc, char ** argv)
       dOut /= 100;
       s.Forward(dOut, sOut);
 
-      fout << std::to_string(i+1) << "," << std::to_string(sOut.index_max()) << std::endl;
+      fout << std::to_string(i+1) << ","
+          << std::to_string(sOut.index_max()) << std::endl;
     }
     fout.close();
   }
