@@ -19,7 +19,7 @@
 int main(int argc, char ** argv)
 {
   // Read the Kaggle data
-  MNISTData md("../data_small");
+  MNISTData md("../data");
 
   std::vector<arma::cube> trainData = md.getTrainData();
   std::vector<arma::vec> trainLabels = md.getTrainLabels();
